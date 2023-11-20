@@ -1,7 +1,14 @@
 'use client'
 
-import { Box, Button, Flex, Text, useDisclosure } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react'
+import colors from '@src/styles/colors'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,8 +37,9 @@ const routes = [
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const pathname = usePathname()
+  const user = JSON.parse(localStorage.getItem('user'))
 
-  console.log(pathname)
+  console.log(user)
 
   return (
     <>
@@ -65,24 +73,37 @@ export default function Header() {
             ))}
           </Flex>
           <Flex gap="1rem" fontSize="1.2em">
-            <Button border={`1px solid ${colors.black}`} onClick={onOpen}>
-              Login
-            </Button>
-            <Link href="/sign-up">
-              <Button
-                backgroundColor={colors.blue}
-                color="white"
-                padding="0.2rem 1rem"
-                borderRadius="5px"
-                fontWeight="bold"
-                fontSize="0.8em"
-                _hover={{
-                  backgroundColor: '#1A428E',
-                }}
-              >
-                Sign Up
-              </Button>
-            </Link>
+            {user ? (
+              <Link href="/profile">
+                <Flex alignItems="center" gap="0.5rem" cursor="pointer">
+                  <Avatar name={user.name} src={user.profilePhoto} size="md" />
+                  <Text fontWeight="bold" fontSize="0.85em">
+                    {user.name}
+                  </Text>
+                </Flex>
+              </Link>
+            ) : (
+              <>
+                <Button border={`1px solid ${colors.black}`} onClick={onOpen}>
+                  Login
+                </Button>
+                <Link href="/sign-up">
+                  <Button
+                    backgroundColor={colors.blue}
+                    color="white"
+                    padding="0.2rem 1rem"
+                    borderRadius="5px"
+                    fontWeight="bold"
+                    fontSize="0.8em"
+                    _hover={{
+                      backgroundColor: '#1A428E',
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </Flex>
         </Flex>
       </Flex>

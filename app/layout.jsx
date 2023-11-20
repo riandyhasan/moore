@@ -1,4 +1,4 @@
-import Header from '@src/src/components/Layout/Header'
+import Header from '@src/components/Layout/Header'
 import './globals.css'
 import { Providers } from './providers'
 

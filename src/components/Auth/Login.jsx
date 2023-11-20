@@ -20,13 +20,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  useToast,
 } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import { login } from '@src/services/auth'
+import colors from '@src/styles/colors'
 import { Field, Form, Formik } from 'formik'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import * as Yup from 'yup'
-
 const validationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
   password: Yup.string().required('Password is required'),
@@ -34,7 +36,9 @@ const validationSchema = Yup.object().shape({
 
 export default function Login({ isOpen, onClose }) {
   const [showPassword, setShowPassword] = useState(false)
-
+  const [submitting, setSubmitting] = useState(false)
+  const toast = useToast()
+  const router = useRouter()
   const handleTogglePasswordVisibility = () => {
     setShowPassword(prevShowPassword => !prevShowPassword)
   }
@@ -44,9 +48,45 @@ export default function Login({ isOpen, onClose }) {
     password: '',
   }
 
-  const handleSubmit = values => {
-    // Handle form submission logic here
-    console.log(values)
+  const handleSubmit = async values => {
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      const { username, password } = values
+      const res = await login(username, password)
+      if (res != 'success') {
+        toast({
+          title: 'Error',
+          description: res,
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+          position: 'top',
+        })
+        return
+      }
+      toast({
+        title: 'Login successful.',
+        description: 'You have logged into your account.',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+      onClose()
+      router.push('/profile')
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.message ?? error,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -120,8 +160,9 @@ export default function Login({ isOpen, onClose }) {
                       backgroundColor: colors.darkerOrange,
                     }}
                     type="submit"
+                    isLoading={submitting}
                   >
-                    Sign Up
+                    Sign In
                   </Button>
                 </Box>
               </Flex>

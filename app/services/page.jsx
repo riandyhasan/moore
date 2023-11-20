@@ -1,7 +1,7 @@
 'use client'
 
 import { Flex, Heading } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import colors from '@src/styles/colors'
 import Link from 'next/link'
 
 const services = [

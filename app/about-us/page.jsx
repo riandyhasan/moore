@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Flex, Heading, Image, Text } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import colors from '@src/styles/colors'
 
 export default function AboutUse() {
   return (

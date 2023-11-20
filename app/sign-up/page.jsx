@@ -12,8 +12,10 @@ import {
   Heading,
   Image,
   Input,
+  useToast,
 } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import { register } from '@src/services/auth'
+import colors from '@src/styles/colors'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
@@ -32,9 +34,17 @@ const validationSchema = Yup.object().shape({
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  const toast = useToast()
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(prevShowPassword => !prevShowPassword)
+  }
+
+  const handleToggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(prevShowConfrimPassword => !prevShowConfrimPassword)
   }
 
   const initialValues = {
@@ -46,9 +56,43 @@ export default function SignUp() {
     address: '',
   }
 
-  const handleSubmit = values => {
-    // Handle form submission logic here
-    console.log(values)
+  const handleSubmit = async values => {
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      const { name, username, email, password, address } = values
+      const res = await register(name, username, email, password, address)
+      if (res != 'success') {
+        toast({
+          title: 'Error',
+          description: res,
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+          position: 'top',
+        })
+        return
+      }
+      toast({
+        title: 'Account created.',
+        description: "We've created your account for you.",
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.message ?? error,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -178,12 +222,26 @@ export default function SignUp() {
                     <FormLabel htmlFor="confirmPassword">
                       Confirm Password<span style={{ color: 'red' }}>*</span>
                     </FormLabel>
-                    <Input
-                      {...field}
-                      type="password"
-                      id="confirmPassword"
-                      placeholder="Confirm your password"
-                    />
+                    <Flex align="center">
+                      <Input
+                        {...field}
+                        type={showPassword ? 'text' : 'password'}
+                        id="confirmPassword"
+                        placeholder="Confirm your password"
+                        width="100%"
+                      />
+                      <Box ml="1" position="absolute" right={5}>
+                        {showConfirmPassword ? (
+                          <FaEyeSlash
+                            onClick={handleToggleConfirmPasswordVisibility}
+                          />
+                        ) : (
+                          <FaEye
+                            onClick={handleToggleConfirmPasswordVisibility}
+                          />
+                        )}
+                      </Box>
+                    </Flex>
                     <FormErrorMessage>{meta.error}</FormErrorMessage>
                   </FormControl>
                 )}
@@ -219,6 +277,7 @@ export default function SignUp() {
                 _hover={{
                   backgroundColor: colors.darkerOrange,
                 }}
+                isLoading={submitting}
                 type="submit"
               >
                 Sign Up

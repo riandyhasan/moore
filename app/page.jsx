@@ -12,7 +12,7 @@ import {
   Heading,
   Input,
 } from '@chakra-ui/react'
-import colors from '@src/src/styles/colors'
+import colors from '@src/styles/colors'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
