@@ -31,11 +31,11 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function Profile() {
-  const user = JSON.parse(localStorage.getItem('user'))
   const router = useRouter()
   const toast = useToast()
+  const [user, setUser] = useState()
   const [editMode, setEditMode] = useState(false)
-  const [avatarImage, setAvatarImage] = useState(user.profilePhoto)
+  const [avatarImage, setAvatarImage] = useState(user?.profilePhoto)
   const [submitting, setSubmitting] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -45,7 +45,7 @@ export default function Profile() {
 
   const handleToggleEditMode = () => {
     setEditMode(!editMode)
-    setAvatarImage(user.profilePhoto)
+    setAvatarImage(user?.profilePhoto)
   }
 
   const handleEditProfilePhoto = () => {
@@ -81,7 +81,7 @@ export default function Profile() {
         ...values,
         profilePhoto: avatarImage,
       }
-      const res = await editUserData(user.id, newData)
+      const res = await editUserData(user?.id, newData)
       if (!res) {
         toast({
           title: 'Error',
@@ -109,8 +109,13 @@ export default function Profile() {
   }
 
   useEffect(() => {
-    if (!user) router.push('/')
-  }, [user])
+    if (typeof window !== 'undefined') {
+      const userData = JSON.parse(localStorage.getItem('user'))
+      if (!userData) router.push('/')
+      else setUser(userData)
+    }
+  }, [])
+
   return (
     <Flex w="100%" flexDir="column" minHeight="80vh" padding="2rem 5rem">
       <Flex w="100%" justifyContent="space-between" alignItems="center">
@@ -132,7 +137,7 @@ export default function Profile() {
             <Flex w="100%" gap="4rem">
               <Box>
                 {!editMode ? (
-                  <Avatar name={user.name} src={avatarImage} size="2xl">
+                  <Avatar name={user?.name} src={avatarImage} size="2xl">
                     <AvatarBadge boxSize="1em" bg="white">
                       <LiaStarSolid color="orange" size="1em" />
                     </AvatarBadge>
@@ -149,7 +154,7 @@ export default function Profile() {
                       />
 
                       <Box onClick={handleEditProfilePhoto} cursor="pointer">
-                        <Avatar name={user.name} src={avatarImage} size="2xl">
+                        <Avatar name={user?.name} src={avatarImage} size="2xl">
                           <AvatarBadge boxSize="1em" bg="white">
                             <LiaStarSolid color="orange" size="1em" />
                           </AvatarBadge>
@@ -175,7 +180,7 @@ export default function Profile() {
                     </Flex>
                   ) : (
                     <>
-                      <Heading>{user.name}</Heading>
+                      <Heading>{user?.name}</Heading>
                       <FiEdit
                         style={{ cursor: 'pointer' }}
                         onClick={handleToggleEditMode}
@@ -201,7 +206,7 @@ export default function Profile() {
                     </Field>
                   ) : (
                     <Text textAlign="left" fontWeight="bold">
-                      {user.username}
+                      {user?.username}
                     </Text>
                   )}
                 </Flex>
@@ -223,7 +228,7 @@ export default function Profile() {
                     </Field>
                   ) : (
                     <Text textAlign="left" fontWeight="bold">
-                      {user.email}
+                      {user?.email}
                     </Text>
                   )}
                 </Flex>
@@ -241,7 +246,7 @@ export default function Profile() {
                     </Field>
                   </Flex>
                 ) : (
-                  <Text>{user.address}</Text>
+                  <Text>{user?.address}</Text>
                 )}
 
                 {editMode && (

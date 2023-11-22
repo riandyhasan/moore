@@ -66,10 +66,10 @@ export default function Home() {
           <Form style={{ width: '100%' }}>
             <Grid templateColumns="1fr" gap={4} w="100%">
               <GridItem>
-                <Field name="username">
+                <Field name="power">
                   {({ field, meta }) => (
                     <FormControl isInvalid={meta.touched && !!meta.error}>
-                      <FormLabel htmlFor="username">Username</FormLabel>
+                      <FormLabel htmlFor="username">Power (kWh)</FormLabel>
                       <Input
                         {...field}
                         id="username"

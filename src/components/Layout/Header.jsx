@@ -12,6 +12,7 @@ import colors from '@src/styles/colors'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { BsLightbulb, BsLightningCharge } from 'react-icons/bs'
 import { HiOutlineUserGroup } from 'react-icons/hi2'
 import Login from '../Auth/Login'
@@ -37,9 +38,14 @@ const routes = [
 export default function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const pathname = usePathname()
-  const user = JSON.parse(localStorage.getItem('user'))
+  const [user, setUser] = useState()
 
-  console.log(user)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userData = JSON.parse(localStorage.getItem('user'))
+      if (userData) setUser(userData)
+    }
+  }, [])
 
   return (
     <>
