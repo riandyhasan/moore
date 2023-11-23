@@ -162,6 +162,7 @@ export default function Home() {
         const newAppliances = Array.from(
           { length: values.appliance },
           (_, index) => ({
+            name: '',
             usage: 0,
             electricity: 0,
           }),
@@ -254,7 +255,7 @@ export default function Home() {
                         {({ field, meta }) => (
                           <FormControl isInvalid={meta.touched && !!meta.error}>
                             <FormLabel htmlFor="appliance">
-                              Jumlah appliance (up to 5)
+                              Appliance count (up to 5)
                             </FormLabel>
                             <Input
                               {...field}
@@ -326,17 +327,19 @@ export default function Home() {
                     {values?.appliances?.map((appliance, idx) => (
                       <Flex key={idx} gap="1rem" w="100%">
                         <Input
-                          value={idx + 1}
-                          type="number"
-                          disabled
+                          type="text"
                           style={{
                             opacity: 1,
                             cursor: 'default',
                           }}
+                          onChange={e => {
+                            let currentAppliances = values.appliances
+                            currentAppliances[idx].name = e.target.value
+                            setFieldValue('appliances', currentAppliances)
+                          }}
                         />
                         <Input
                           value={appliance.usage}
-                          placeholder="Enter appliace"
                           type="number"
                           onChange={e => {
                             let currentAppliances = values.appliances
@@ -347,7 +350,6 @@ export default function Home() {
 
                         <Input
                           value={appliance.electricity}
-                          placeholder="Enter appliace"
                           type="number"
                           onChange={e => {
                             let currentAppliances = values.appliances
