@@ -43,7 +43,12 @@ export default function ProductProcurement() {
       </Flex>
 
       <Flex w="100%" px="8rem" mt="2rem">
-        <Grid templateColumns="1fr 1fr" w="100%" rowGap="2rem">
+        <Grid
+          templateColumns="1fr 1fr"
+          w="100%"
+          rowGap="2rem"
+          columnGap="1.5rem"
+        >
           {products.map((product, idx) => (
             <GridItem key={idx}>
               <Flex

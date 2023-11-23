@@ -74,7 +74,7 @@ export default function Login({ isOpen, onClose }) {
         position: 'top',
       })
       onClose()
-      router.push('/profile')
+      window.location.assign('/')
     } catch (error) {
       toast({
         title: 'Error',

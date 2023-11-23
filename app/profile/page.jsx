@@ -10,6 +10,7 @@ import {
   FormErrorMessage,
   Heading,
   Input,
+  Spinner,
   Text,
   useToast,
 } from '@chakra-ui/react'
@@ -37,6 +38,7 @@ export default function Profile() {
   const [editMode, setEditMode] = useState(false)
   const [avatarImage, setAvatarImage] = useState(user?.profilePhoto)
   const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
   const fileInputRef = useRef(null)
 
   const initialValues = {
@@ -68,7 +70,7 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await logout()
-      router.push('/')
+      window.location.assign('/')
     } catch (e) {}
   }
 
@@ -112,7 +114,11 @@ export default function Profile() {
     if (typeof window !== 'undefined') {
       const userData = JSON.parse(localStorage.getItem('user'))
       if (!userData) router.push('/')
-      else setUser(userData)
+      else {
+        setUser(userData)
+        setAvatarImage(userData.profilePhoto)
+      }
+      setLoading(false)
     }
   }, [])
 
@@ -127,160 +133,181 @@ export default function Profile() {
         </Box>
       </Flex>
 
-      <Flex w="100%" flexDir="column" mt="2rem" px="4rem">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          <Form>
-            <Flex w="100%" gap="4rem">
-              <Box>
-                {!editMode ? (
-                  <Avatar name={user?.name} src={avatarImage} size="2xl">
-                    <AvatarBadge boxSize="1em" bg="white">
-                      <LiaStarSolid color="orange" size="1em" />
-                    </AvatarBadge>
-                  </Avatar>
-                ) : (
-                  <FormControl>
-                    <Box position="relative">
-                      <input
-                        type="file"
-                        onChange={handleImageChange}
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        ref={fileInputRef}
-                      />
+      {!loading ? (
+        <Flex w="100%" flexDir="column" mt="2rem" px="4rem">
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            <Form>
+              <Flex w="100%" gap="4rem">
+                <Box>
+                  {!editMode ? (
+                    <Avatar name={user?.name} src={avatarImage} size="2xl">
+                      <AvatarBadge boxSize="1em" bg="white">
+                        <LiaStarSolid color="orange" size="1em" />
+                      </AvatarBadge>
+                    </Avatar>
+                  ) : (
+                    <FormControl>
+                      <Box position="relative">
+                        <input
+                          type="file"
+                          onChange={handleImageChange}
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          ref={fileInputRef}
+                        />
 
-                      <Box onClick={handleEditProfilePhoto} cursor="pointer">
-                        <Avatar name={user?.name} src={avatarImage} size="2xl">
-                          <AvatarBadge boxSize="1em" bg="white">
-                            <LiaStarSolid color="orange" size="1em" />
-                          </AvatarBadge>
-                        </Avatar>
+                        <Box onClick={handleEditProfilePhoto} cursor="pointer">
+                          <Avatar
+                            name={user?.name}
+                            src={avatarImage}
+                            size="2xl"
+                          >
+                            <AvatarBadge boxSize="1em" bg="white">
+                              <LiaStarSolid color="orange" size="1em" />
+                            </AvatarBadge>
+                          </Avatar>
+                        </Box>
                       </Box>
-                    </Box>
-                  </FormControl>
-                )}
-              </Box>
-              <Flex flexDir="column" gap="0.2rem" w="100%">
-                <Flex gap="1rem" alignItems="center" w="100%">
-                  {editMode ? (
-                    <Flex gap="4rem" alignItems="center" w="100%">
-                      <Text width="100px">Name:</Text>
-                      <Field name="name">
+                    </FormControl>
+                  )}
+                </Box>
+                <Flex flexDir="column" gap="0.2rem" w="100%">
+                  <Flex gap="1rem" alignItems="center" w="100%">
+                    {editMode ? (
+                      <Flex gap="4rem" alignItems="center" w="100%">
+                        <Text width="100px">Name:</Text>
+                        <Field name="name">
+                          {({ field, meta }) => (
+                            <FormControl
+                              isInvalid={meta.touched && !!meta.error}
+                            >
+                              <Input {...field} placeholder="Enter your name" />
+                              <FormErrorMessage>{meta.error}</FormErrorMessage>
+                            </FormControl>
+                          )}
+                        </Field>
+                      </Flex>
+                    ) : (
+                      <>
+                        <Heading>{user?.name}</Heading>
+                        <FiEdit
+                          style={{ cursor: 'pointer' }}
+                          onClick={handleToggleEditMode}
+                        />
+                      </>
+                    )}
+                  </Flex>
+
+                  <Flex gap="4rem" alignItems="center">
+                    <Text width="100px">Username: </Text>
+                    {editMode ? (
+                      <Field name="username">
                         {({ field, meta }) => (
                           <FormControl isInvalid={meta.touched && !!meta.error}>
-                            <Input {...field} placeholder="Enter your name" />
+                            <Input
+                              {...field}
+                              placeholder="Enter your username"
+                              isDisabled
+                            />
+                            <FormErrorMessage>{meta.error}</FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
+                    ) : (
+                      <Text textAlign="left" fontWeight="bold">
+                        {user?.username}
+                      </Text>
+                    )}
+                  </Flex>
+
+                  <Flex gap="4rem" alignItems="center">
+                    <Text width="100px">Email: </Text>
+                    {editMode ? (
+                      <Field name="email">
+                        {({ field, meta }) => (
+                          <FormControl isInvalid={meta.touched && !!meta.error}>
+                            <Input
+                              {...field}
+                              placeholder="Enter your email"
+                              isDisabled
+                            />
+                            <FormErrorMessage>{meta.error}</FormErrorMessage>
+                          </FormControl>
+                        )}
+                      </Field>
+                    ) : (
+                      <Text textAlign="left" fontWeight="bold">
+                        {user?.email}
+                      </Text>
+                    )}
+                  </Flex>
+
+                  {editMode ? (
+                    <Flex gap="4rem" alignItems="center">
+                      <Text width="100px">Address: </Text>
+                      <Field name="address">
+                        {({ field, meta }) => (
+                          <FormControl isInvalid={meta.touched && !!meta.error}>
+                            <Input
+                              {...field}
+                              placeholder="Enter your address"
+                            />
                             <FormErrorMessage>{meta.error}</FormErrorMessage>
                           </FormControl>
                         )}
                       </Field>
                     </Flex>
                   ) : (
-                    <>
-                      <Heading>{user?.name}</Heading>
-                      <FiEdit
-                        style={{ cursor: 'pointer' }}
-                        onClick={handleToggleEditMode}
-                      />
-                    </>
+                    <Text>{user?.address}</Text>
+                  )}
+
+                  {editMode && (
+                    <Flex w="100%" justifyContent="flex-end" gap="1rem">
+                      <Box>
+                        <Button
+                          mt="2"
+                          colorScheme="red"
+                          onClick={handleToggleEditMode}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
+                      <Box>
+                        <Button
+                          mt="2"
+                          backgroundColor={colors.blue}
+                          color="white"
+                          _hover={{
+                            backgroundColor: colors.darkerBlue,
+                          }}
+                          type="submit"
+                          isLoading={submitting}
+                        >
+                          Save Changes
+                        </Button>
+                      </Box>
+                    </Flex>
                   )}
                 </Flex>
-
-                <Flex gap="4rem" alignItems="center">
-                  <Text width="100px">Username: </Text>
-                  {editMode ? (
-                    <Field name="username">
-                      {({ field, meta }) => (
-                        <FormControl isInvalid={meta.touched && !!meta.error}>
-                          <Input
-                            {...field}
-                            placeholder="Enter your username"
-                            isDisabled
-                          />
-                          <FormErrorMessage>{meta.error}</FormErrorMessage>
-                        </FormControl>
-                      )}
-                    </Field>
-                  ) : (
-                    <Text textAlign="left" fontWeight="bold">
-                      {user?.username}
-                    </Text>
-                  )}
-                </Flex>
-
-                <Flex gap="4rem" alignItems="center">
-                  <Text width="100px">Email: </Text>
-                  {editMode ? (
-                    <Field name="email">
-                      {({ field, meta }) => (
-                        <FormControl isInvalid={meta.touched && !!meta.error}>
-                          <Input
-                            {...field}
-                            placeholder="Enter your email"
-                            isDisabled
-                          />
-                          <FormErrorMessage>{meta.error}</FormErrorMessage>
-                        </FormControl>
-                      )}
-                    </Field>
-                  ) : (
-                    <Text textAlign="left" fontWeight="bold">
-                      {user?.email}
-                    </Text>
-                  )}
-                </Flex>
-
-                {editMode ? (
-                  <Flex gap="4rem" alignItems="center">
-                    <Text width="100px">Address: </Text>
-                    <Field name="address">
-                      {({ field, meta }) => (
-                        <FormControl isInvalid={meta.touched && !!meta.error}>
-                          <Input {...field} placeholder="Enter your address" />
-                          <FormErrorMessage>{meta.error}</FormErrorMessage>
-                        </FormControl>
-                      )}
-                    </Field>
-                  </Flex>
-                ) : (
-                  <Text>{user?.address}</Text>
-                )}
-
-                {editMode && (
-                  <Flex w="100%" justifyContent="flex-end" gap="1rem">
-                    <Box>
-                      <Button
-                        mt="2"
-                        colorScheme="red"
-                        onClick={handleToggleEditMode}
-                      >
-                        Cancel
-                      </Button>
-                    </Box>
-                    <Box>
-                      <Button
-                        mt="2"
-                        backgroundColor={colors.blue}
-                        color="white"
-                        _hover={{
-                          backgroundColor: colors.darkerBlue,
-                        }}
-                        type="submit"
-                        isLoading={submitting}
-                      >
-                        Save Changes
-                      </Button>
-                    </Box>
-                  </Flex>
-                )}
               </Flex>
-            </Flex>
-          </Form>
-        </Formik>
-      </Flex>
+            </Form>
+          </Formik>
+        </Flex>
+      ) : (
+        <Flex w="100%" h="70vh" justifyContent="center" alignItems="center">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color={colors.orange}
+            size="xl"
+          />
+        </Flex>
+      )}
     </Flex>
   )
 }

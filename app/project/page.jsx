@@ -1,17 +1,8 @@
 'use client'
 
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Text,
-} from '@chakra-ui/react'
+import { Flex, Heading } from '@chakra-ui/react'
+import colors from '@src/styles/colors'
+import { MdOutlineRateReview } from 'react-icons/md'
 
 export default function Project() {
   return (
@@ -26,8 +17,19 @@ export default function Project() {
         <Heading fontSize="2.5em">Reviews</Heading>
       </Flex>
 
-      <Flex w="100%">
-        <Grid gap="2rem" templateColumns="1fr 1fr 1fr" w="100%">
+      <Flex w="100%" h="100%">
+        <Flex
+          w="100%"
+          h="50vh"
+          justifyContent="center"
+          alignItems="center"
+          flexDir="column"
+          color={colors.orange}
+        >
+          <MdOutlineRateReview size="3em" />
+          <Heading size="2.5em">No review yet.</Heading>
+        </Flex>
+        {/* <Grid gap="2rem" templateColumns="1fr 1fr 1fr" w="100%">
           <GridItem>
             <Card boxShadow="2px 4px 4px 4px rgba(0, 0, 0, 0.2)">
               <CardHeader>
@@ -75,7 +77,7 @@ export default function Project() {
               </CardFooter>
             </Card>
           </GridItem>
-        </Grid>
+        </Grid> */}
       </Flex>
     </Flex>
   )
